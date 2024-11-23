@@ -6,3 +6,4 @@ repl-temp-*
 help.txt
 node_modules
 dist
+logs

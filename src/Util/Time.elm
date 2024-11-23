@@ -139,10 +139,18 @@ durationBetween (Time.millisToPosix 1000) (Time.millisToPosix 1000) --> Nothing
 
 -}
 durationBetween : Time.Posix -> Time.Posix -> Maybe Duration
-durationBetween _ _ =
-    -- Nothing
-    Debug.todo "durationBetween"
-
+durationBetween t1 t2 =
+    if Time.posixToMillis t2 - Time.posixToMillis t1 <= 0 then
+        Nothing
+    else
+        let
+            diffMillis = Time.posixToMillis t2 - Time.posixToMillis t1
+            days = diffMillis // (24 * 60 * 60 * 1000)
+            hours = (modBy (24 * 60 * 60 * 1000) diffMillis) // (60 * 60 * 1000)
+            minutes = (modBy (60 * 60 * 1000) diffMillis) // (60 * 1000)
+            seconds = (modBy (60 * 1000) diffMillis) // 1000
+        in
+        Just { seconds = seconds, minutes = minutes, hours = hours, days = days }
 
 {-| Format a `Duration` as a human readable string
 
@@ -164,6 +172,41 @@ durationBetween _ _ =
 
 -}
 formatDuration : Duration -> String
-formatDuration _ =
-    -- ""
-    Debug.todo "formatDuration"
+formatDuration duration =
+    let
+        dayStr =
+            if duration.days == 1 then
+                "1 day"
+            else if duration.days > 1 then
+                String.fromInt duration.days ++ " days"
+            else
+                ""
+
+        hourStr =
+            if duration.hours == 1 then
+                "1 hour"
+            else if duration.hours > 1 then
+                String.fromInt duration.hours ++ " hours"
+            else
+                ""
+
+        minuteStr =
+            if duration.minutes == 1 then
+                "1 minute"
+            else if duration.minutes > 1 then
+                String.fromInt duration.minutes ++ " minutes"
+            else
+                ""
+
+        secondStr =
+            if duration.seconds == 1 then
+                "1 second"
+            else if duration.seconds > 1 then
+                String.fromInt duration.seconds ++ " seconds"
+            else
+                ""
+        
+        combined =
+            String.join " " (List.filter (\str -> str /= "") [ dayStr, hourStr, minuteStr, secondStr ])
+    in
+    combined ++ " ago"

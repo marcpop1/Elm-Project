@@ -149,7 +149,13 @@ update msg model =
 
                 ( Model.LoadedPosts state, ConfigChanged change ) ->
                     -- ( Model.LoadedPosts state, Effect.NoEffect )
-                    ( Debug.todo "update the config in the update function", Effect.NoEffect )
+                    let
+                        updatedConfig = Model.PostsConfig.applyChanges change state.config
+                    in
+                    ( Model.LoadedPosts
+                        { state | config = updatedConfig }
+                    , Effect.NoEffect
+                    )
 
                 ( state, _ ) ->
                     ( state, Effect.NoEffect )

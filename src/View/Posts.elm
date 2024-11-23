@@ -28,7 +28,13 @@ Relevant library functions:
 
 -}
 postTable : PostsConfig -> Time.Posix -> List Post -> Html Msg
-postTable _ now posts =
+postTable config now posts =
+    let
+        -- Filter posts based on the configuration settings
+        postsToShow =
+            posts
+                |> filterPosts config
+    in
     Html.table []
         [ Html.thead []
             [ Html.tr []
@@ -40,8 +46,9 @@ postTable _ now posts =
                 ]
             ]
         , Html.tbody []
-            (List.map (postRow now) posts)
+            (List.map (postRow now) postsToShow)
         ]
+
 
 
 postRow : Time.Posix -> Post -> Html Msg
