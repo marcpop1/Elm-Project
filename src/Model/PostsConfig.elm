@@ -43,9 +43,22 @@ sortToString sort =
 
 -}
 sortFromString : String -> Maybe SortBy
-sortFromString _ =
-    -- Nothing
-    Debug.todo "sortFromString"
+sortFromString sort =
+    case sort of
+        "Score" ->
+            Just Score
+
+        "Title" ->
+            Just Title
+
+        "Posted" ->
+            Just Posted
+
+        "None" ->
+            Just None
+
+        _ ->
+            Nothing
 
 
 sortToCompareFn : SortBy -> (Post -> Post -> Order)
@@ -81,14 +94,28 @@ defaultConfig =
 {-| A type that describes what option changed and how
 -}
 type Change
-    = ChangeTODO
+    = SetPostsToShow Int
+    | SetSortBy SortBy
+    | SetShowJobs Bool
+    | SetShowTextOnly Bool
 
 
 {-| Given a change and the current configuration, return a new configuration with the changes applied
 -}
 applyChanges : Change -> PostsConfig -> PostsConfig
-applyChanges _ _ =
-    Debug.todo "applyChanges"
+applyChanges change config =
+    case change of
+        SetPostsToShow postsToShow ->
+            { config | postsToShow = postsToShow }
+
+        SetSortBy sortBy ->
+            { config | sortBy = sortBy }
+
+        SetShowJobs showJobs ->
+            { config | showJobs = showJobs }
+
+        SetShowTextOnly showTextOnly ->
+            { config | showTextOnly = showTextOnly }
 
 
 {-| Given the configuration and a list of posts, return the relevant subset of posts according to the configuration
@@ -103,6 +130,29 @@ Relevant library functions:
 
 -}
 filterPosts : PostsConfig -> List Post -> List Post
-filterPosts _ _ =
-    -- []
-    Debug.todo "filterPosts"
+filterPosts config posts =
+    let
+        -- Step 1: Filter out posts based on showTextOnly (remove posts with no URL)
+        postsWithUrl =
+            if config.showTextOnly then
+                posts
+            else
+                List.filter (\post -> case post.url of
+                                        Just _ -> True
+                                        Nothing -> False
+                                      ) posts
+
+        -- Step 2: Filter out job posts based on showJobs (remove posts with type "job")
+        nonJobPosts =
+            if config.showJobs then
+                postsWithUrl
+            else
+                List.filter (\post -> post.type_ /= "job") postsWithUrl
+
+        -- Step 3: Limit the posts to the number specified by postsToShow
+        limitedPosts = List.take config.postsToShow nonJobPosts
+
+        -- Step 4: Sort the posts based on the sortBy configuration
+        sortedPosts = List.sortWith (sortToCompareFn config.sortBy) limitedPosts
+    in
+    sortedPosts

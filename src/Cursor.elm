@@ -35,9 +35,13 @@ nonEmpty x xs =
 
 -}
 fromList : List a -> Maybe (Cursor a)
-fromList _ =
-    -- Nothing
-    Debug.todo "fromList"
+fromList list =
+    case list of
+        [] ->
+            Nothing
+
+        x::xs ->
+            Just (withSelectedElement [] x xs)
 
 
 {-| Convert the `Cursor` to a `List`
@@ -46,9 +50,9 @@ fromList _ =
 
 -}
 toList : Cursor a -> List a
-toList _ =
-    -- []
-    Debug.todo "toList"
+toList (Cursor left mid right) =
+    List.reverse left ++ (mid :: right)
+    
 
 
 {-| Get the current element from the cursor
@@ -77,9 +81,12 @@ If the cursor would go past the last element, the function should return `Nothin
 
 -}
 forward : Cursor a -> Maybe (Cursor a)
-forward _ =
-    -- Nothing
-    Debug.todo "forward"
+forward (Cursor left mid right) =
+    case right of
+        [] ->
+            Nothing
+        x :: xs ->
+            Just (Cursor (mid :: left) x xs)
 
 
 {-| Move the cursor backward.
@@ -94,9 +101,12 @@ If the cursor would go before the first element, the function should return `Not
 
 -}
 back : Cursor a -> Maybe (Cursor a)
-back _ =
-    -- Nothing
-    Debug.todo "back"
+back (Cursor left mid right) =
+    case left of
+        [] ->
+            Nothing
+        x :: xs ->
+            Just (Cursor xs x (mid :: right))
 
 
 {-| Get the number of elements
@@ -107,6 +117,5 @@ back _ =
 
 -}
 length : Cursor a -> Int
-length _ =
-    -- 0
-    Debug.todo "length"
+length (Cursor left _ right) =
+    1 + List.length left + List.length right
