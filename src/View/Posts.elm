@@ -49,19 +49,24 @@ postTable config now posts =
             (List.map (postRow now) postsToShow)
         ]
 
-
-
 postRow : Time.Posix -> Post -> Html Msg
 postRow now post =
+    let
+        duration =
+            Util.Time.durationBetween post.time now
+                |> Maybe.withDefault { seconds = 0, minutes = 0, hours = 0, days = 0 }
+    in
     Html.tr []
         [ Html.td [ Html.Attributes.class "post-score" ] [ Html.text (String.fromInt post.score) ]
         , Html.td [ Html.Attributes.class "post-title" ] [ Html.text post.title ]
         , Html.td [ Html.Attributes.class "post-type" ] [ Html.text post.type_ ]
-        , Html.td [ Html.Attributes.class "post-time" ] [ Html.text (Util.Time.formatTime Time.utc post.time) ]
+        , Html.td [ Html.Attributes.class "post-time" ]
+            [ Html.text <| 
+                (Util.Time.formatTime Time.utc post.time) ++ " (" ++ (Util.Time.formatDuration duration) ++ ")"
+            ]
         , Html.td [ Html.Attributes.class "post-url" ]
             [ Html.a [ Html.Attributes.href (Maybe.withDefault "#" post.url) ] [ Html.text "Link" ] ]
         ]
-
 
 
 {-| Show the configuration options for the posts table
