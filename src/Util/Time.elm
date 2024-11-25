@@ -207,6 +207,6 @@ formatDuration duration =
                 ""
         
         combined =
-            String.join " " (List.filter (\str -> str /= "") [ dayStr, hourStr, minuteStr, "and", secondStr ])
+            String.join " " (List.filter (\str -> str /= "") [ dayStr, hourStr, minuteStr, secondStr ])
     in
     combined ++ " ago"
